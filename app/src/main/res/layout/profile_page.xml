@@ -6,21 +6,11 @@
     android:weightSum="1">
 
     <TextView
-        android:id="@+id/textView3"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:text="Matched!"
-        android:textColor="@android:color/holo_blue_dark"
-        android:textSize="24sp"
-        android:typeface="normal" />
-
-    <TextView
         android:id="@+id/greet_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
-        android:text="How are you MR ...."
+        android:text="Hello Guest !"
         android:textColor="@android:color/holo_blue_dark"
         android:textSize="24sp"
         android:typeface="normal" />
@@ -49,8 +39,7 @@
                 android:id="@+id/username_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-
-                android:text="usr_name"
+                android:text="Name : -"
                 android:textColor="?attr/actionMenuTextColor"
                 android:textSize="24sp"
                 android:textStyle="bold"
@@ -60,7 +49,7 @@
                 android:id="@+id/position_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="position"
+                android:text="Position : -"
                 android:textColor="?attr/actionMenuTextColor"
                 android:textSize="18sp"
                 android:textStyle="bold"
@@ -70,7 +59,7 @@
                 android:id="@+id/usrid_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="User id:"
+                android:text="ID : -"
                 android:textColor="?attr/actionMenuTextColor"
                 android:textSize="18sp"
                 android:textStyle="bold"

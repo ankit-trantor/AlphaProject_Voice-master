@@ -39,7 +39,7 @@ public class firstPage extends AppCompatActivity {
 //            "042fbc8d-7081-4ee9-aae2-90a691bf1cb6", // TH
             "3209c42f-545c-474e-8d3f-1022d52ac765", // CY
 //            "016ab45a-dc53-4ccb-a97d-7e848266ad4a", // Marilyn
-//            "78540070-d192-474b-b089-a2190bd57347", // Amir
+            "78540070-d192-474b-b089-a2190bd57347", // Amir
 //            "76fd3c3a-fab3-4692-8473-e9d19c48875d", // Adrian
 //            "4fef5be3-a534-4788-b521-7d899d5cf96a", // SoonLengYap
 //            "ab7bb31c-1c00-4caa-a975-863999e6bd5b"  // Eugene
@@ -306,6 +306,7 @@ public class firstPage extends AppCompatActivity {
 
                     if (result.mResult.result == Result.ACCEPT) {
                         Intent intent = new Intent(firstPage.this, profile.class);
+                        intent.putExtra("authProfileId", response.mProfileId.toString());
                         startActivity(intent);
                     }
                 } else {

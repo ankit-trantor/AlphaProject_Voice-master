@@ -17,29 +17,41 @@ public class profile extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.profile_page);
-        Button startBtn = ((Button) findViewById(R.id.StartUsing_btn));
-        Button cnfigBtn = ((Button) findViewById(R.id.cnfigBtn));
-        ImageView a = ((ImageView) findViewById(R.id.imageView2));
-        startBtn.setOnClickListener(btnClick);
-        cnfigBtn.setOnClickListener(btnClick);
-        TextView username = ((TextView) findViewById(R.id.username_text));
-        TextView userId = ((TextView)findViewById(R.id.usrid_text));
-        TextView position = ((TextView) findViewById(R.id.position_text));
-        TextView greeting = ((TextView)findViewById(R.id.greet_text));
-        Button cnfgProfile = ((Button)findViewById(R.id.cnfigBtn));
 
-        a.setImageResource(R.mipmap.ic_amir);
-        String name = "Amir";
-        String coreID = "XJH786";
-        String Pos = "ISP";
-        /*todo: add switch case that change the name variable*/
-        greeting.setText("Hello "+name);
-        username.setText("Name : "+name);
-        userId.setText("ID : "+coreID);
-        position.setText("Position : "+Pos);
-        //todo: remove this line
-        cnfgProfile.setVisibility(View.GONE);
+        AzureUsersInfo UsersInfo = new AzureUsersInfo();
+        Bundle extras = getIntent().getExtras();
+
+        if(extras != null) {
+            String profileId = extras.getString("authProfileId");
+            MotoUserInfo userInfo = UsersInfo.getMotoInfo(profileId);
+
+            if (userInfo != null) {
+                Button startBtn = ((Button) findViewById(R.id.StartUsing_btn));
+                Button cnfigBtn = ((Button) findViewById(R.id.cnfigBtn));
+                ImageView a = ((ImageView) findViewById(R.id.imageView2));
+                startBtn.setOnClickListener(btnClick);
+                cnfigBtn.setOnClickListener(btnClick);
+                Button cnfgProfile = ((Button)findViewById(R.id.cnfigBtn));
+
+                a.setImageResource(userInfo.getProfileImage());
+                String name = userInfo.getName();
+                String coreID = userInfo.getCoreId();
+                String Pos = userInfo.getPosition();
+
+                TextView username = ((TextView) findViewById(R.id.username_text));
+                TextView userId = ((TextView)findViewById(R.id.usrid_text));
+                TextView position = ((TextView) findViewById(R.id.position_text));
+                TextView greeting = ((TextView)findViewById(R.id.greet_text));
+                greeting.setText("Hello " + name + " !");
+                username.setText("Name : " + name);
+                userId.setText("ID : " + coreID);
+                position.setText("Position : " + Pos);
+                //todo: remove this line
+                cnfgProfile.setVisibility(View.GONE);
+            }
+        }
     }
+
     private View.OnClickListener btnClick = new View.OnClickListener() {
         public void onClick(View v) {
             switch (v.getId()) {

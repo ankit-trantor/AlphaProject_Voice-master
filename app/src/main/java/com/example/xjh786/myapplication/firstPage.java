@@ -1,6 +1,7 @@
 package com.example.xjh786.myapplication;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -8,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.microsoft.cognitive.speakerrecognition.SpeakerVerificationRestClient;
@@ -23,6 +25,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.locks.ReentrantLock;
+
+//
 
 /**
  * Created by XJH786 on 9/8/2017.
@@ -68,6 +72,8 @@ public class firstPage extends AppCompatActivity {
         Button btnStart = ((Button) findViewById(R.id.btnStart));
         btnStart.setOnClickListener(btnClick);
         Button btnDummyNext = ((Button) findViewById(R.id.button2));
+        TextView heading = ((TextView)findViewById(R.id.textView));
+        heading.setText("SPEAK YOUR PASS PHRASE");
         btnDummyNext.setOnClickListener(btnClick);
 
         audioControllerObj = new AudioController();
@@ -83,6 +89,7 @@ public class firstPage extends AppCompatActivity {
 
     private View.OnClickListener btnClick = new View.OnClickListener() {
         public void onClick(View v) {
+            TextView heading = ((TextView)findViewById(R.id.textView));
             switch (v.getId()) {
                 case R.id.btnStart: {
                     Button btnStart = ((Button) findViewById(R.id.btnStart));
@@ -92,7 +99,6 @@ public class firstPage extends AppCompatActivity {
                         case RECORDING:
                             btnStart.setEnabled(true);
                             return_value = audioControllerObj.stopRecord(true);
-
                             switch (return_value) {
                                 case ReturnCode.SUCCESS:
                                     recorderHandler.removeCallbacks(handlerCallback);
@@ -101,6 +107,7 @@ public class firstPage extends AppCompatActivity {
                                     }
                                     buttonState = BUTTON_STATE.PROCESSING;
                                     btnStart.setEnabled(false);
+
                                     break;
 
                                 case ReturnCode.AUDIO_CONTROLLER_CONVERSION_FAILURE:
@@ -114,6 +121,7 @@ public class firstPage extends AppCompatActivity {
                             break;
 
                         case IDLE:
+
                             return_value = audioControllerObj.startRecord();
                             btnStart.setEnabled(true);
                             switch (return_value) {
@@ -148,6 +156,18 @@ public class firstPage extends AppCompatActivity {
 
                         default:
                             break;
+                    }
+                    if(buttonState == BUTTON_STATE.PROCESSING)
+                    {   heading.setText("PROCESSING...");
+                        heading.setTextColor(Color.RED);
+                    }
+                    else if(buttonState == BUTTON_STATE.RECORDING)
+                    {   heading.setText("RECORDING");
+                        heading.setTextColor(Color.BLACK);
+                    }
+                    else //todo: not working
+                    {   heading.setText("SPEAK YOUR PASS PHRASE");
+                        heading.setTextColor(Color.BLACK);
                     }
                     btnStart.setText(buttonStateString.get(buttonState));
                     break;

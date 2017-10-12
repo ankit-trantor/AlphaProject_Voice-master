@@ -1,7 +1,6 @@
 package com.example.xjh786.myapplication;
 
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -14,11 +13,13 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
+import com.zello.sdk.Tab;
 import com.zello.sdk.Zello;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements com.zello.sdk.Events {
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -29,7 +30,9 @@ public class MainActivity extends AppCompatActivity {
      * {@link android.support.v4.app.FragmentStatePagerAdapter}.
      */
     private SectionsPagerAdapter mSectionsPagerAdapter;
-
+    private com.zello.sdk.AppState _appState = new com.zello.sdk.AppState();
+    private com.zello.sdk.MessageIn _messageIn = new com.zello.sdk.MessageIn();
+    private com.zello.sdk.MessageOut _messageOut = new com.zello.sdk.MessageOut();
     /**
      * The {@link ViewPager} that will host the section contents.
      */
@@ -49,17 +52,18 @@ public class MainActivity extends AppCompatActivity {
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
         Zello.getInstance().setSelectedUserOrGateway("Everyone");
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        Button fab = (Button) findViewById(R.id.fab);
         fab.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
+                Button fab = (Button) findViewById(R.id.fab);
                 switch(event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
-
+                        fab.setBackgroundResource(R.mipmap.rptt);
                         Zello.getInstance().beginMessage();
                         return true; // if you want to handle the touch event
                     case MotionEvent.ACTION_UP:
-
+                        fab.setBackgroundResource(R.mipmap.gptt);
                         Zello.getInstance().endMessage();
                         return true; // if you want to handle the touch event
                 }
@@ -68,8 +72,44 @@ public class MainActivity extends AppCompatActivity {
         });
 
     }
+    @Override
+    public void onSelectedContactChanged() {
+        //updateSelectedContact();
+    }
+    @Override
+    public  void onContactsChanged(){}
+    @Override
+    public void onMicrophonePermissionNotGranted(){}
+    @Override
+    public void onAudioStateChanged(){}
+    @Override
+    public void onLastContactsTabChanged(Tab var1){}
+    @Override
+    public void onAppStateChanged(){}
+    @Override
+    public void onMessageStateChanged() {
+        updateMessageState();
+    }
 
+    private void updateMessageState() {
+        TextView callerID = ((TextView)findViewById(R.id.caller));
+        Zello.getInstance().getMessageIn(_messageIn);
+        Zello.getInstance().getMessageOut(_messageOut);
 
+        boolean incoming = _messageIn.isActive(); // Is incoming message active?
+        boolean outgoing = _messageOut.isActive(); // Is outgoing message active?
+        if (outgoing) {
+            callerID.setText(_messageOut.getTo().getDisplayName());
+        }
+        else{
+            String author = _messageIn.getAuthor().getDisplayName(); // Is message from channel?
+            if (author != null && author.length() > 0) {
+                callerID.setText(_messageIn.getFrom().getDisplayName() + " \\ " + author); // Show channel and author names
+            } else {
+                callerID.setText(_messageIn.getFrom().getDisplayName()); // Show sender name
+            }
+        }
+    }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.

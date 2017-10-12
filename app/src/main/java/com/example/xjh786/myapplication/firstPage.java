@@ -322,7 +322,7 @@ public class firstPage extends AppCompatActivity {
                     result_to_show = result_to_show + result.mResult.phrase;
                     Toast.makeText(firstPage.this, result_to_show, Toast.LENGTH_LONG).show();
                     Log.d(TAG, result_to_show);
-                    Toast.makeText(firstPage.this, result_to_show, Toast.LENGTH_LONG).show();
+                    //Toast.makeText(firstPage.this, result_to_show, Toast.LENGTH_LONG).show();
 
                     if (result.mResult.result == Result.ACCEPT) {
                         Intent intent = new Intent(firstPage.this, profile.class);

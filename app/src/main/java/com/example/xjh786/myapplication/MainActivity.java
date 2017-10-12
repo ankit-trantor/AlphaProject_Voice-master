@@ -47,7 +47,9 @@ public class MainActivity extends AppCompatActivity implements com.zello.sdk.Eve
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
-
+//        TextView callerID = ((TextView)findViewById(R.id.caller));
+//        callerID.setVisibility(View.INVISIBLE);
+//        callerID.setText("TRANSMITTING....");
         // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
@@ -56,15 +58,19 @@ public class MainActivity extends AppCompatActivity implements com.zello.sdk.Eve
         fab.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
+                TextView callerID = ((TextView)findViewById(R.id.caller));
                 Button fab = (Button) findViewById(R.id.fab);
                 switch(event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
                         fab.setBackgroundResource(R.mipmap.rptt);
                         Zello.getInstance().beginMessage();
+                        callerID.setVisibility(View.VISIBLE);
+                        callerID.setText("TRANSMITTING....");
                         return true; // if you want to handle the touch event
                     case MotionEvent.ACTION_UP:
                         fab.setBackgroundResource(R.mipmap.gptt);
                         Zello.getInstance().endMessage();
+                        callerID.setVisibility(View.INVISIBLE);
                         return true; // if you want to handle the touch event
                 }
                 return false;

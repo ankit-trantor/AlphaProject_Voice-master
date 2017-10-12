@@ -75,7 +75,7 @@ public class firstPage extends AppCompatActivity {
         TextView heading = ((TextView)findViewById(R.id.textView));
         heading.setText("SPEAK YOUR PASS PHRASE");
         btnDummyNext.setOnClickListener(btnClick);
-
+        btnDummyNext.setVisibility(View.INVISIBLE);
         audioControllerObj = new AudioController();
         recorderHandler = new Handler();
         azureVerificationClientObj = new SpeakerVerificationRestClient(AzureUsersInfo.SUBSCRIPTION_KEY);
@@ -338,6 +338,9 @@ public class firstPage extends AppCompatActivity {
                 Button btnStart = ((Button) findViewById(R.id.btnStart));
                 btnStart.setText(buttonStateString.get(buttonState));
                 btnStart.setEnabled(true);
+                TextView heading = ((TextView)findViewById(R.id.textView));
+                heading.setText("SPEAK YOUR PASS PHRASE");
+                heading.setTextColor(Color.BLACK);
             }
         }
     }

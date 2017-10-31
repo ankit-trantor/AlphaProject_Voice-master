@@ -2,6 +2,7 @@ package com.example.xjh786.myapplication;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
@@ -13,6 +14,11 @@ import android.widget.TextView;
  */
 
 public class profile extends AppCompatActivity {
+
+    private String profileId;
+    private Handler logoutHandler = new Handler();;
+    private boolean enableIdentification = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -22,7 +28,7 @@ public class profile extends AppCompatActivity {
         Bundle extras = getIntent().getExtras();
 
         if(extras != null) {
-            String profileId = extras.getString("authProfileId");
+            profileId = extras.getString("authProfileId");
             MotoUserInfo userInfo = UsersInfo.getMotoInfo(profileId);
 
             if (userInfo != null) {
@@ -50,14 +56,35 @@ public class profile extends AppCompatActivity {
                 cnfgProfile.setVisibility(View.GONE);
             }
         }
+
+        if (!enableIdentification) {
+            logoutHandler.postDelayed(handlerCallback, 8000);
+        }
     }
+
+    @Override
+    public void onBackPressed() {
+        if (!enableIdentification) {
+            logoutHandler.removeCallbacks(handlerCallback);
+        }
+        finish();
+    }
+
+    private Runnable handlerCallback = new Runnable() {
+        @Override
+        public void run() {
+            finish();
+        }
+    };
 
     private View.OnClickListener btnClick = new View.OnClickListener() {
         public void onClick(View v) {
             switch (v.getId()) {
                 case R.id.StartUsing_btn: {
                     Intent intent = new Intent(profile.this, MainActivity.class);
+                    intent.putExtra("authProfileId", profileId);
                     startActivity(intent);
+                    finish();
                     break;
                 }
                 case R.id.cnfigBtn: {

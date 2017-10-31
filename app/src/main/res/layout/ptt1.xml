@@ -41,15 +41,6 @@
         android:layout_margin="5dp"/>
 
     <TextView
-        android:id="@+id/callIDText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="TextView"
-        android:textColor="@android:color/black"
-        android:textSize="18sp"
-        android:layout_margin="5dp"/>
-
-    <TextView
         android:id="@+id/TxPwrText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

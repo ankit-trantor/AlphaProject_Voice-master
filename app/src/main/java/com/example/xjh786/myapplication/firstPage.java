@@ -1,10 +1,12 @@
 package com.example.xjh786.myapplication;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -41,7 +43,7 @@ public class firstPage extends AppCompatActivity {
     final int HANDLER_TIMEOUT_DURATION = 15000 + 1000; // 15sec recording timeout duration.
     final String[] AZURE_PROFILE_ID = {
 //            "042fbc8d-7081-4ee9-aae2-90a691bf1cb6", // TH
-            "3209c42f-545c-474e-8d3f-1022d52ac765", // CY
+//            "3209c42f-545c-474e-8d3f-1022d52ac765", // CY
 //            "016ab45a-dc53-4ccb-a97d-7e848266ad4a", // Marilyn
             "78540070-d192-474b-b089-a2190bd57347", // Amir
 //            "76fd3c3a-fab3-4692-8473-e9d19c48875d", // Adrian
@@ -64,6 +66,9 @@ public class firstPage extends AppCompatActivity {
     private AzureVerificationResponseController azureVerificationResponseController; // To keep track verification asynctask result.
     private BUTTON_STATE buttonState = BUTTON_STATE.IDLE;
     private Map<BUTTON_STATE, String> buttonStateString = new HashMap<>();
+    private AlertDialog alert;
+    private AsyncTask requestTask = null;
+    private Handler requestHandler = new Handler();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -85,6 +90,18 @@ public class firstPage extends AppCompatActivity {
         buttonStateString.put(BUTTON_STATE.RECORDING, "RECORDING");
         buttonStateString.put(BUTTON_STATE.PROCESSING, "AUTHENTICATING");
         btnStart.setEnabled(true);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        View mView = getLayoutInflater().inflate(R.layout.verification_fail_popup, null);
+        builder.setView(mView);
+        Button btnDismiss = (Button) mView.findViewById(R.id.btnDismiss);
+        btnDismiss.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                alert.dismiss();
+            }
+        });
+        alert = builder.create();
     }
 
     private View.OnClickListener btnClick = new View.OnClickListener() {
@@ -102,12 +119,10 @@ public class firstPage extends AppCompatActivity {
                             switch (return_value) {
                                 case ReturnCode.SUCCESS:
                                     recorderHandler.removeCallbacks(handlerCallback);
-                                    for (String profileId : AZURE_PROFILE_ID) {
-                                        new AzureVerificationRequestTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, profileId, AudioController.WAV_FILE);
-                                    }
+                                    requestTask = new AzureVerificationRequestTask().execute(AZURE_PROFILE_ID[0], AudioController.WAV_FILE);
                                     buttonState = BUTTON_STATE.PROCESSING;
                                     btnStart.setEnabled(false);
-
+                                    requestHandler.postDelayed(requestHandlerCallback, 20000);
                                     break;
 
                                 case ReturnCode.AUDIO_CONTROLLER_CONVERSION_FAILURE:
@@ -192,6 +207,28 @@ public class firstPage extends AppCompatActivity {
         }
     };
 
+    private Runnable requestHandlerCallback = new Runnable() {
+        @Override
+        public void run() {
+            if (requestTask != null){
+                Log.e(TAG, "timer timeout");
+                requestTask.cancel(true);
+                buttonState = BUTTON_STATE.IDLE;
+                Button btnStart = ((Button) findViewById(R.id.btnStart));
+                btnStart.setText(buttonStateString.get(buttonState));
+                btnStart.setEnabled(true);
+                TextView heading = ((TextView)findViewById(R.id.textView));
+                heading.setText("SPEAK YOUR PASS PHRASE");
+                heading.setTextColor(Color.BLACK);
+                alert.show();
+                requestTask = null;
+                azureVerificationResponseController.forceReset();
+            }
+            requestHandler.removeCallbacks(requestHandlerCallback);
+        }
+    };
+
+
     private class AzureVerificationResult {
         Verification mResult;
         UUID mProfileId;
@@ -238,6 +275,12 @@ public class firstPage extends AppCompatActivity {
 
             rLock.unlock();
             return returnValue;
+        }
+
+        private void forceReset() {
+            rLock.lock();
+            azureRequestCount = 0;
+            rLock.unlock();
         }
 
         private int update(AzureVerificationResult response) {
@@ -314,15 +357,15 @@ public class firstPage extends AppCompatActivity {
 
         protected void onPostExecute(AzureVerificationResult response) {
             if (azureVerificationResponseController.update(response) == 0) {
+                requestHandler.removeCallbacks(requestHandlerCallback);
+                requestTask = null;
                 AzureVerificationResult result = azureVerificationResponseController.getResult();
 
                 if (result != null) {
                     String result_to_show = result.mResult.result.toString() + " : ";
                     result_to_show = result_to_show + result.mResult.confidence.toString() + " : ";
                     result_to_show = result_to_show + result.mResult.phrase;
-                    Toast.makeText(firstPage.this, result_to_show, Toast.LENGTH_LONG).show();
                     Log.d(TAG, result_to_show);
-                    //Toast.makeText(firstPage.this, result_to_show, Toast.LENGTH_LONG).show();
 
                     if (result.mResult.result == Result.ACCEPT) {
                         Intent intent = new Intent(firstPage.this, profile.class);
@@ -331,7 +374,7 @@ public class firstPage extends AppCompatActivity {
                     }
                 } else {
                     Log.e(TAG, "Verification Fail.");
-                    Toast.makeText(firstPage.this, ("Verification Fail."), Toast.LENGTH_LONG).show();
+                    alert.show();
                 }
 
                 buttonState = BUTTON_STATE.IDLE;

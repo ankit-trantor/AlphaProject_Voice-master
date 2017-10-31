@@ -1,12 +1,18 @@
 package com.example.xjh786.myapplication;
 
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -15,11 +21,36 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.microsoft.cognitive.speakerrecognition.SpeakerIdentificationRestClient;
+import com.microsoft.cognitive.speakerrecognition.contract.identification.IdentificationException;
+import com.microsoft.cognitive.speakerrecognition.contract.identification.IdentificationOperation;
+import com.microsoft.cognitive.speakerrecognition.contract.identification.OperationLocation;
 import com.zello.sdk.Tab;
 import com.zello.sdk.Zello;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.UUID;
+
 public class MainActivity extends AppCompatActivity implements com.zello.sdk.Events {
+
+    final String TAG = "IdentificationActivity"; // For logs.
+    private String profileId;
+    private Handler logoutHandler = new Handler();
+    private SpeakerIdentificationRestClient azureIdentificationClientObj = new SpeakerIdentificationRestClient(AzureUsersInfo.SUBSCRIPTION_KEY);
+    private final List<UUID> AZURE_PROFILE_UUID = Arrays.asList(UUID.fromString("705edfbf-089e-4ab7-ad29-e62980ee4683"));
+    private OperationLocation gIdentifyResult = null;
+    private int callCount = 0;
+    private AudioController audioControllerObj = new AudioController();
+    private boolean enableIdentification = false;
+    private AlertDialog alert;
+    private AlertDialog alert2;
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -41,6 +72,34 @@ public class MainActivity extends AppCompatActivity implements com.zello.sdk.Eve
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Bundle extras = getIntent().getExtras();
+        if(extras != null) {
+            profileId = extras.getString("authProfileId");
+        }
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+        View mView = getLayoutInflater().inflate(R.layout.unauthorised_popup, null);
+        builder.setView(mView);
+        Button btnDismiss = (Button) mView.findViewById(R.id.btnDismiss);
+        btnDismiss.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                alert.dismiss();
+                finish();
+            }
+        });
+        alert = builder.create();
+        AlertDialog.Builder builder2 = new AlertDialog.Builder(MainActivity.this);
+        View mView2 = getLayoutInflater().inflate(R.layout.authorised_popup, null);
+        builder2.setView(mView2);
+        Button btnDismiss2 = (Button) mView2.findViewById(R.id.btnDismiss2);
+        btnDismiss2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                alert2.dismiss();
+            }
+        });
+        alert2 = builder2.create();
+
         Zello.getInstance().configure("net.loudtalks", this);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -66,18 +125,52 @@ public class MainActivity extends AppCompatActivity implements com.zello.sdk.Eve
                         Zello.getInstance().beginMessage();
                         callerID.setVisibility(View.VISIBLE);
                         callerID.setText("TRANSMITTING....");
+                        if (enableIdentification) {
+                            audioControllerObj.startRecord();
+                        } else {
+                            logoutHandler.removeCallbacks(handlerCallback);
+                        }
                         return true; // if you want to handle the touch event
                     case MotionEvent.ACTION_UP:
                         fab.setBackgroundResource(R.mipmap.gptt);
                         Zello.getInstance().endMessage();
                         callerID.setVisibility(View.INVISIBLE);
+                        if (enableIdentification) {
+                            fab.setEnabled(false);
+                            audioControllerObj.stopRecord(true);
+                            new AzureVerificationRequestTask().execute(AudioController.WAV_FILE);
+                        } else {
+                            logoutHandler.postDelayed(handlerCallback, 8000);
+                        }
                         return true; // if you want to handle the touch event
                 }
                 return false;
             }
         });
 
+        if (!enableIdentification) {
+            logoutHandler.postDelayed(handlerCallback, 8000);
+        }
     }
+
+    @Override
+    public void onBackPressed() {
+        if (!enableIdentification) {
+            logoutHandler.removeCallbacks(handlerCallback);
+        }
+        Intent intent = new Intent(MainActivity.this, profile.class);
+        intent.putExtra("authProfileId", profileId);
+        startActivity(intent);
+        finish();
+    }
+
+    private Runnable handlerCallback = new Runnable() {
+        @Override
+        public void run() {
+            finish();
+        }
+    };
+
     @Override
     public void onSelectedContactChanged() {
         //updateSelectedContact();
@@ -170,15 +263,13 @@ public class MainActivity extends AppCompatActivity implements com.zello.sdk.Eve
             if(getArguments().getInt(ARG_SECTION_NUMBER) == 1) {
                 rootView = inflater.inflate(R.layout.ptt1, container, false);
                 TextView textView = (TextView) rootView.findViewById(R.id.callGroupText);
-                textView.setText("Call Group: ");
+                textView.setText("Call Group: IPK Innoplex");
                 textView = (TextView) rootView.findViewById(R.id.TXfreqText);
-                textView.setText("Transmit Frequency: ");
+                textView.setText("Transmit Frequency: 451.51 Hz");
                 textView = (TextView) rootView.findViewById(R.id.RXFreqText);
-                textView.setText("Receive Frequency: ");
-                textView = (TextView) rootView.findViewById(R.id.callIDText);
-                textView.setText("Call ID: ");
+                textView.setText("Receive Frequency: 451.51 Hz");
                 textView = (TextView) rootView.findViewById(R.id.TxPwrText);
-                textView.setText("Tx Power: ");
+                textView.setText("Tx Power: High");
             }
             else
             {
@@ -231,4 +322,93 @@ public class MainActivity extends AppCompatActivity implements com.zello.sdk.Eve
         }
 
     }
+
+    private class AzureVerificationRequestTask extends AsyncTask<String, Void, OperationLocation> {
+
+        protected OperationLocation doInBackground(String... params) {
+            if (params != null) {
+                try {
+                    File audio = new File(params[0]);
+                    FileInputStream fis = null;
+
+                    try {
+                        fis = new FileInputStream(audio);
+                    } catch (FileNotFoundException e) {
+                        Log.e(TAG, "Audio file not found.");
+                    }
+
+                    if (fis != null) {
+                        OperationLocation identificationResponse = null;
+
+                        try {
+                            identificationResponse = azureIdentificationClientObj.identify(fis, AZURE_PROFILE_UUID, true);
+                        } catch (IOException | IdentificationException e) {
+                            Log.e(TAG, "Error encountered during identification process. - " + e.getMessage());
+                        }
+
+                        gIdentifyResult = identificationResponse;
+                        callCount = 0;
+                        return identificationResponse;
+                    }
+                } catch(RuntimeException e){
+                    Log.e(TAG, e.getMessage());
+                }
+            }
+
+            return null;
+        }
+
+        protected void onPostExecute(OperationLocation response) {
+            new AzureIdentifyChkStatRequest().execute(response);
+        }
+    }
+
+    private class AzureIdentifyChkStatRequest extends AsyncTask<OperationLocation, Void, IdentificationOperation> {
+
+        protected IdentificationOperation doInBackground(OperationLocation... params) {
+            IdentificationOperation enrollmentResult = null;
+
+            if (params != null) {
+                try {
+                    enrollmentResult = azureIdentificationClientObj.checkIdentificationStatus(params[0]);
+                } catch (IOException | IdentificationException e) {
+                    Log.e(TAG, "Error encountered during enrollment. - " + e.getMessage());
+                }
+            }
+
+            return enrollmentResult;
+        }
+
+        protected void onPostExecute(IdentificationOperation result) {
+            callCount ++;
+
+            Log.e(TAG, "1");
+            if (result == null || result.processingResult == null) {
+                if (callCount < 3) {
+                    new Handler().postDelayed(identificationHandlerCallback, 3000);
+                } else {
+                    Toast.makeText(MainActivity.this, ("Azure fails to response."), Toast.LENGTH_LONG).show();
+                    finish();
+                }
+            } else {
+                callCount = 0;
+                Log.e(TAG, "Authenticate person - " + result.processingResult.confidence + " " + result.processingResult.identifiedProfileId);
+                if (result.processingResult.identifiedProfileId.toString().equals("00000000-0000-0000-0000-000000000000")){
+                    alert.show();
+                } else {
+                    // Toast.makeText(MainActivity.this, ("Is an authorised person."), Toast.LENGTH_LONG).show();
+                    Button fab = (Button) findViewById(R.id.fab);
+                    fab.setEnabled(true);
+                    alert2.show();
+                }
+            }
+        }
+    }
+
+    private Runnable identificationHandlerCallback = new Runnable() {
+        @Override
+        public void run() {
+            new AzureIdentifyChkStatRequest().execute(gIdentifyResult);
+        }
+    };
 }

@@ -15,16 +15,17 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".phraseActivity"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:name=".phraseActivity">
         </activity>
         <activity
-            android:name=".regActivity"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:name=".regActivity">
         </activity>
         <activity
             android:name=".MainActivity"
             android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+        <activity
+            android:name=".succss">
         </activity>
         <activity
             android:name=".LogOrReg"

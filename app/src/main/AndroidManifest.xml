@@ -21,6 +21,12 @@
             android:name=".regActivity">
         </activity>
         <activity
+            android:name=".freq">
+        </activity>
+        <activity
+            android:name=".selectPhrase">
+        </activity>
+        <activity
             android:name=".MainActivity"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>

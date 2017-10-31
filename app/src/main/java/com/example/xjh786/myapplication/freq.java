@@ -7,24 +7,23 @@ import android.view.View;
 import android.widget.Button;
 
 /**
- * Created by XJH786 on 9/18/2017.
+ * Created by XJH786 on 10/31/2017.
  */
 
-public class regActivity extends AppCompatActivity {
+public class freq extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.reg_layout);
-        Button submitBtn = ((Button) findViewById(R.id.submitBtn));
+        setContentView(R.layout.channel);
+        Button submitBtn = ((Button) findViewById(R.id.button2));
         submitBtn.setOnClickListener(btnClick);
     }
     private View.OnClickListener btnClick = new View.OnClickListener() {
         public void onClick(View v) {
             switch (v.getId()) {
-                case R.id.submitBtn: {
-                    Intent intent = new Intent(regActivity.this, freq.class);
+                case R.id.button2: {
+                    Intent intent = new Intent(freq.this, selectPhrase.class);
                     startActivity(intent);
-                    break;
                 }
             }
         }

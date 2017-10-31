@@ -1,6 +1,5 @@
 package com.example.xjh786.myapplication;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.AsyncTask;
@@ -76,11 +75,8 @@ public class firstPage extends AppCompatActivity {
         setContentView(R.layout.voice);
         Button btnStart = ((Button) findViewById(R.id.btnStart));
         btnStart.setOnClickListener(btnClick);
-        Button btnDummyNext = ((Button) findViewById(R.id.button2));
         TextView heading = ((TextView)findViewById(R.id.textView));
         heading.setText("SPEAK YOUR PASS PHRASE");
-        btnDummyNext.setOnClickListener(btnClick);
-        btnDummyNext.setVisibility(View.INVISIBLE);
         audioControllerObj = new AudioController();
         recorderHandler = new Handler();
         azureVerificationClientObj = new SpeakerVerificationRestClient(AzureUsersInfo.SUBSCRIPTION_KEY);
@@ -188,12 +184,7 @@ public class firstPage extends AppCompatActivity {
                     break;
                 }
 
-                case R.id.button2:
-                    Intent intent = new Intent(firstPage.this, profile.class);
-                    startActivity(intent);
-                    break;
-
-                default:
+                 default:
                     break;
             }
         }

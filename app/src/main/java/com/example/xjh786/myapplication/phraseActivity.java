@@ -17,6 +17,14 @@ public class phraseActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.phrase_selector);
+        Bundle extras = getIntent().getExtras();
+        String firstword;
+        if(extras != null) {
+            TextView first = ((TextView) findViewById(R.id.textView5));
+            firstword = extras.getString("Phrase");
+            first.setText("Speak \"" +firstword + "\"");
+
+        }
         Button submitBtn = ((Button) findViewById(R.id.button));
         submitBtn.setOnClickListener(btnClick);
     }

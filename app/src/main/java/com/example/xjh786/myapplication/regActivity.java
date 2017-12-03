@@ -24,6 +24,7 @@ public class regActivity extends AppCompatActivity {
                 case R.id.submitBtn: {
                     Intent intent = new Intent(regActivity.this, freq.class);
                     startActivity(intent);
+                    finish();
                     break;
                 }
             }

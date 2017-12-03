@@ -24,6 +24,7 @@ public class freq extends AppCompatActivity {
                 case R.id.button2: {
                     Intent intent = new Intent(freq.this, selectPhrase.class);
                     startActivity(intent);
+                    finish();
                 }
             }
         }

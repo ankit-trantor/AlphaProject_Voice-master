@@ -68,6 +68,7 @@ public class selectPhrase extends AppCompatActivity {
             Intent intent = new Intent(selectPhrase.this, phraseActivity.class);
             intent.putExtra("Phrase", passphrase);
             startActivity(intent);
+            finish();
         }
 
     };

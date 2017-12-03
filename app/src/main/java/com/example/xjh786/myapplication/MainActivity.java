@@ -1,6 +1,5 @@
 package com.example.xjh786.myapplication;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -265,9 +264,9 @@ public class MainActivity extends AppCompatActivity implements com.zello.sdk.Eve
                 TextView textView = (TextView) rootView.findViewById(R.id.callGroupText);
                 textView.setText("Call Group: IPK Innoplex");
                 textView = (TextView) rootView.findViewById(R.id.TXfreqText);
-                textView.setText("Transmit Frequency: 451.51 Hz");
+                textView.setText("Transmit Frequency: 159.5 MHz");
                 textView = (TextView) rootView.findViewById(R.id.RXFreqText);
-                textView.setText("Receive Frequency: 451.51 Hz");
+                textView.setText("Receive Frequency: 159.5 MHz");
                 textView = (TextView) rootView.findViewById(R.id.TxPwrText);
                 textView.setText("Tx Power: High");
             }

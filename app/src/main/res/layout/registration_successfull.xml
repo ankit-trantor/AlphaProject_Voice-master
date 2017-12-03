@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -8,8 +10,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Congratulation!"
-        android:textSize="30sp"
-        android:textStyle="bold" />
+        android:textAppearance="@style/TextAppearance.AppCompat"
+        android:textSize="36sp"
+        android:textStyle="bold"
+        android:layout_margin="10dp"/>
 
     <Space
         android:layout_width="match_parent"
@@ -21,25 +25,38 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Your profile is successfully registered"
-        android:textSize="18sp" />
-
-    <Space
-        android:layout_width="match_parent"
-        android:layout_height="50dp" />
+        android:textAppearance="@style/TextAppearance.AppCompat"
+        android:layout_margin="10dp"/>
 
     <TextView
         android:id="@+id/textView11"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Proceed to the sign in page to sign in" />
+        android:text="Proceed to the sign in page to sign in"
+        android:textAppearance="@style/TextAppearance.AppCompat"
+        android:layout_margin="10dp"/>
 
     <Space
         android:layout_width="match_parent"
         android:layout_height="50dp" />
 
-    <Button
-        android:id="@+id/firstpgBtn"
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/linearLayout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Sign In" />
+        android:layout_height="match_parent">
+
+        <Button
+            android:id="@+id/firstpgBtn"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_marginBottom="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:background="@android:color/holo_blue_bright"
+            android:text="Sign In"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+    </android.support.constraint.ConstraintLayout>
+
 </LinearLayout>
